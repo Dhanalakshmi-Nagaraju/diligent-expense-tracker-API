@@ -106,4 +106,27 @@ class ExpenseServiceImplTest {
 
         verify(repository).findAll();
     }
+
+    @Test
+    void shouldReturnExpensesByCategory() {
+
+        List<Expense> expenses = List.of(
+                Expense.builder()
+                        .title("Coffee")
+                        .amount(BigDecimal.valueOf(120))
+                        .category(Category.FOOD)
+                        .date(LocalDate.now())
+                        .build()
+        );
+
+        when(repository.findByCategory(Category.FOOD))
+                .thenReturn(expenses);
+
+        List<Expense> result = expenseService.getExpensesByCategory(Category.FOOD);
+
+        assertEquals(1, result.size());
+        assertEquals(Category.FOOD, result.get(0).getCategory());
+
+        verify(repository).findByCategory(Category.FOOD);
+    }
 }
