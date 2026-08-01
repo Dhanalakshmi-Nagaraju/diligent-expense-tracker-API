@@ -2,6 +2,7 @@ package com.diligent.expense_tracker.service;
 
 import com.diligent.expense_tracker.dto.ExpenseRequest;
 import com.diligent.expense_tracker.dto.TotalExpenseResponse;
+import com.diligent.expense_tracker.exception.ExpenseNotFoundException;
 import com.diligent.expense_tracker.model.Category;
 import com.diligent.expense_tracker.model.Expense;
 import com.diligent.expense_tracker.repository.ExpenseRepository;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -186,5 +188,36 @@ class ExpenseServiceImplTest {
         assertEquals(BigDecimal.valueOf(350), response.getTotal());
 
         verify(repository).findByCategory(Category.FOOD);
+    }
+
+    @Test
+    void shouldDeleteExpenseSuccessfully() {
+
+        UUID id = UUID.randomUUID();
+
+        Expense expense = Expense.builder()
+                .id(id)
+                .build();
+
+        when(repository.findById(id))
+                .thenReturn(Optional.of(expense));
+
+        expenseService.deleteExpense(id);
+
+        verify(repository).deleteById(id);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenExpenseNotFound() {
+
+        UUID id = UUID.randomUUID();
+
+        when(repository.findById(id))
+                .thenReturn(Optional.empty());
+
+        assertThrows(ExpenseNotFoundException.class,
+                () -> expenseService.deleteExpense(id));
+
+        verify(repository, never()).deleteById(any());
     }
 }

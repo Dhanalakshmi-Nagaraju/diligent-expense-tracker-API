@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,6 +35,16 @@ public class InMemoryExpenseRepository implements ExpenseRepository {
                 .stream()
                 .filter(expense -> expense.getCategory().equals(category))
                 .toList();
+    }
+
+    @Override
+    public Optional<Expense> findById(UUID id) {
+        return Optional.ofNullable(expenses.get(id));
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        expenses.remove(id);
     }
 
 }

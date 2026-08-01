@@ -6,6 +6,7 @@ import com.diligent.expense_tracker.model.Category;
 import com.diligent.expense_tracker.model.Expense;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ExpenseService {
 
@@ -18,5 +19,7 @@ public interface ExpenseService {
     TotalExpenseResponse calculateTotalExpenses();
 
     TotalExpenseResponse calculateTotalExpensesByCategory(Category category);
+
+    void deleteExpense(UUID id);
 
 }
