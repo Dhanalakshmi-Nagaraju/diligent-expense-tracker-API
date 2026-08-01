@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @WebMvcTest(ExpenseController.class)
 class ExpenseControllerTest {
@@ -165,5 +165,16 @@ class ExpenseControllerTest {
                         .param("category", "FOOD"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(350));
+    }
+
+    @Test
+    void shouldDeleteExpenseSuccessfully() throws Exception {
+
+        UUID id = UUID.randomUUID();
+
+        doNothing().when(expenseService).deleteExpense(id);
+
+        mockMvc.perform(delete("/expenses/{id}", id))
+                .andExpect(status().isNoContent());
     }
 }

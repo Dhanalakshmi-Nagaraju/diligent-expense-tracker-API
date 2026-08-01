@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/expenses")
@@ -52,6 +53,14 @@ public class ExpenseController {
 
         return ResponseEntity.ok(
                 expenseService.calculateTotalExpensesByCategory(category));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteExpense(@PathVariable UUID id) {
+
+        expenseService.deleteExpense(id);
+
+        return ResponseEntity.noContent().build();
     }
 
 }

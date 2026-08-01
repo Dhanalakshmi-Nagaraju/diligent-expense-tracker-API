@@ -2,6 +2,7 @@ package com.diligent.expense_tracker.service;
 
 import com.diligent.expense_tracker.dto.ExpenseRequest;
 import com.diligent.expense_tracker.dto.TotalExpenseResponse;
+import com.diligent.expense_tracker.exception.ExpenseNotFoundException;
 import com.diligent.expense_tracker.model.Category;
 import com.diligent.expense_tracker.model.Expense;
 import com.diligent.expense_tracker.repository.ExpenseRepository;
@@ -66,6 +67,17 @@ public class ExpenseServiceImpl implements ExpenseService {
         return TotalExpenseResponse.builder()
                 .total(total)
                 .build();
+    }
+
+    @Override
+    public void deleteExpense(UUID id) {
+
+        repository.findById(id)
+                .orElseThrow(() ->
+                        new ExpenseNotFoundException(
+                                "Expense not found with id: " + id));
+
+        repository.deleteById(id);
     }
 
 }
