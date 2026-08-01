@@ -3,6 +3,8 @@ package com.diligent.expense_tracker.repository;
 import com.diligent.expense_tracker.model.Expense;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,6 +19,11 @@ public class InMemoryExpenseRepository implements ExpenseRepository {
         expenses.put(expense.getId(), expense);
 
         return expense;
+    }
+
+    @Override
+    public List<Expense> findAll() {
+        return new ArrayList<>(expenses.values());
     }
 
 }
