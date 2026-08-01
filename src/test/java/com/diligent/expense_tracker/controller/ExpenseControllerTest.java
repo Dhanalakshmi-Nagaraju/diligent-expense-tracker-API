@@ -1,17 +1,17 @@
 package com.diligent.expense_tracker.controller;
 
 import com.diligent.expense_tracker.dto.ExpenseRequest;
+import com.diligent.expense_tracker.dto.GenericResponse;
 import com.diligent.expense_tracker.dto.TotalExpenseResponse;
 import com.diligent.expense_tracker.model.Category;
 import com.diligent.expense_tracker.model.Expense;
 import com.diligent.expense_tracker.service.ExpenseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -22,7 +22,6 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -56,16 +55,18 @@ class ExpenseControllerTest {
                 .date(LocalDate.parse("2026-08-01"))
                 .build();
 
-        when(expenseService.addExpense(any(ExpenseRequest.class)))
+        when(expenseService.addExpense(any()))
                 .thenReturn(response);
 
         mockMvc.perform(post("/expenses")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title").value("Coffee"))
-                .andExpect(jsonPath("$.amount").value(120))
-                .andExpect(jsonPath("$.category").value("FOOD"));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Expense created successfully"))
+                .andExpect(jsonPath("$.data.title").value("Coffee"))
+                .andExpect(jsonPath("$.data.amount").value(120))
+                .andExpect(jsonPath("$.data.category").value("FOOD"));
     }
 
     @Test
@@ -79,7 +80,8 @@ class ExpenseControllerTest {
         mockMvc.perform(post("/expenses")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false));
     }
 
     @Test
@@ -109,9 +111,10 @@ class ExpenseControllerTest {
 
         mockMvc.perform(get("/expenses"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(2))
-                .andExpect(jsonPath("$[0].title").value("Coffee"))
-                .andExpect(jsonPath("$[1].title").value("Movie"));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.length()").value(2))
+                .andExpect(jsonPath("$.data[0].title").value("Coffee"))
+                .andExpect(jsonPath("$.data[1].title").value("Movie"));
     }
 
     @Test
@@ -132,8 +135,9 @@ class ExpenseControllerTest {
         mockMvc.perform(get("/expenses")
                         .param("category", "FOOD"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(1))
-                .andExpect(jsonPath("$[0].category").value("FOOD"));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.length()").value(1))
+                .andExpect(jsonPath("$.data[0].category").value("FOOD"));
     }
 
     @Test
@@ -148,7 +152,8 @@ class ExpenseControllerTest {
 
         mockMvc.perform(get("/expenses/total"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.total").value(600));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.total").value(600));
     }
 
     @Test
@@ -164,7 +169,8 @@ class ExpenseControllerTest {
         mockMvc.perform(get("/expenses/total")
                         .param("category", "FOOD"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.total").value(350));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.total").value(350));
     }
 
     @Test
@@ -175,6 +181,8 @@ class ExpenseControllerTest {
         doNothing().when(expenseService).deleteExpense(id);
 
         mockMvc.perform(delete("/expenses/{id}", id))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Expense deleted successfully"));
     }
 }
