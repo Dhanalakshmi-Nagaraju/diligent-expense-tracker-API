@@ -43,10 +43,15 @@ public class ExpenseController {
     }
 
     @GetMapping("/total")
-    public ResponseEntity<TotalExpenseResponse> calculateTotalExpenses() {
+    public ResponseEntity<TotalExpenseResponse> calculateTotalExpenses(
+            @RequestParam(required = false) Category category) {
 
-        return ResponseEntity.ok(expenseService.calculateTotalExpenses());
+        if (category == null) {
+            return ResponseEntity.ok(expenseService.calculateTotalExpenses());
+        }
 
+        return ResponseEntity.ok(
+                expenseService.calculateTotalExpensesByCategory(category));
     }
 
 }
