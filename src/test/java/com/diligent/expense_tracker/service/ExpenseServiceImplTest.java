@@ -13,6 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -73,5 +75,35 @@ class ExpenseServiceImplTest {
         Expense expense = captor.getValue();
 
         assertNotNull(expense.getId());
+    }
+
+    @Test
+    void shouldReturnAllExpenses() {
+
+        List<Expense> expenses = List.of(
+                Expense.builder()
+                        .id(UUID.randomUUID())
+                        .title("Coffee")
+                        .amount(BigDecimal.valueOf(120))
+                        .category(Category.FOOD)
+                        .date(LocalDate.now())
+                        .build(),
+
+                Expense.builder()
+                        .id(UUID.randomUUID())
+                        .title("Movie")
+                        .amount(BigDecimal.valueOf(300))
+                        .category(Category.ENTERTAINMENT)
+                        .date(LocalDate.now())
+                        .build()
+        );
+
+        when(repository.findAll()).thenReturn(expenses);
+
+        List<Expense> result = expenseService.getAllExpenses();
+
+        assertEquals(2, result.size());
+
+        verify(repository).findAll();
     }
 }
