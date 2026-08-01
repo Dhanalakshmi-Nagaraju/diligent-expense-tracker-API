@@ -6,6 +6,7 @@ import com.diligent.expense_tracker.repository.ExpenseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -26,6 +27,11 @@ public class ExpenseServiceImpl implements ExpenseService {
                 .build();
 
         return repository.save(expense);
+    }
+
+    @Override
+    public List<Expense> getAllExpenses() {
+        return repository.findAll();
     }
 
 }
