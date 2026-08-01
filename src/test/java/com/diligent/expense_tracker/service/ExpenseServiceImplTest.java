@@ -1,6 +1,7 @@
 package com.diligent.expense_tracker.service;
 
 import com.diligent.expense_tracker.dto.ExpenseRequest;
+import com.diligent.expense_tracker.dto.TotalExpenseResponse;
 import com.diligent.expense_tracker.model.Category;
 import com.diligent.expense_tracker.model.Expense;
 import com.diligent.expense_tracker.repository.ExpenseRepository;
@@ -128,5 +129,34 @@ class ExpenseServiceImplTest {
         assertEquals(Category.FOOD, result.get(0).getCategory());
 
         verify(repository).findByCategory(Category.FOOD);
+    }
+
+    @Test
+    void shouldCalculateTotalExpenses() {
+
+        List<Expense> expenses = List.of(
+
+                Expense.builder()
+                        .amount(BigDecimal.valueOf(100))
+                        .build(),
+
+                Expense.builder()
+                        .amount(BigDecimal.valueOf(200))
+                        .build(),
+
+                Expense.builder()
+                        .amount(BigDecimal.valueOf(300))
+                        .build()
+
+        );
+
+        when(repository.findAll()).thenReturn(expenses);
+
+        TotalExpenseResponse response =
+                expenseService.calculateTotalExpenses();
+
+        assertEquals(BigDecimal.valueOf(600), response.getTotal());
+
+        verify(repository).findAll();
     }
 }

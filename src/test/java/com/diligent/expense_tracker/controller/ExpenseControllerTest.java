@@ -1,6 +1,7 @@
 package com.diligent.expense_tracker.controller;
 
 import com.diligent.expense_tracker.dto.ExpenseRequest;
+import com.diligent.expense_tracker.dto.TotalExpenseResponse;
 import com.diligent.expense_tracker.model.Category;
 import com.diligent.expense_tracker.model.Expense;
 import com.diligent.expense_tracker.service.ExpenseService;
@@ -133,5 +134,20 @@ class ExpenseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(1))
                 .andExpect(jsonPath("$[0].category").value("FOOD"));
+    }
+
+    @Test
+    void shouldReturnTotalExpenses() throws Exception {
+
+        TotalExpenseResponse response = TotalExpenseResponse.builder()
+                .total(BigDecimal.valueOf(600))
+                .build();
+
+        when(expenseService.calculateTotalExpenses())
+                .thenReturn(response);
+
+        mockMvc.perform(get("/expenses/total"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(600));
     }
 }

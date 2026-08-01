@@ -1,6 +1,7 @@
 package com.diligent.expense_tracker.controller;
 
 import com.diligent.expense_tracker.dto.ExpenseRequest;
+import com.diligent.expense_tracker.dto.TotalExpenseResponse;
 import com.diligent.expense_tracker.model.Category;
 import com.diligent.expense_tracker.model.Expense;
 import com.diligent.expense_tracker.service.ExpenseService;
@@ -39,6 +40,13 @@ public class ExpenseController {
         }
 
         return ResponseEntity.ok(expenseService.getExpensesByCategory(category));
+    }
+
+    @GetMapping("/total")
+    public ResponseEntity<TotalExpenseResponse> calculateTotalExpenses() {
+
+        return ResponseEntity.ok(expenseService.calculateTotalExpenses());
+
     }
 
 }
