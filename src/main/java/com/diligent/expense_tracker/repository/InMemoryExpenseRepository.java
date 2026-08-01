@@ -1,5 +1,6 @@
 package com.diligent.expense_tracker.repository;
 
+import com.diligent.expense_tracker.model.Category;
 import com.diligent.expense_tracker.model.Expense;
 import org.springframework.stereotype.Repository;
 
@@ -24,6 +25,15 @@ public class InMemoryExpenseRepository implements ExpenseRepository {
     @Override
     public List<Expense> findAll() {
         return new ArrayList<>(expenses.values());
+    }
+
+    @Override
+    public List<Expense> findByCategory(Category category) {
+
+        return expenses.values()
+                .stream()
+                .filter(expense -> expense.getCategory().equals(category))
+                .toList();
     }
 
 }
