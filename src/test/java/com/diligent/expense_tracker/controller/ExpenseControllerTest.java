@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -22,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @WebMvcTest(ExpenseController.class)
 class ExpenseControllerTest {
@@ -77,5 +79,37 @@ class ExpenseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnAllExpenses() throws Exception {
+
+        List<Expense> expenses = List.of(
+
+                Expense.builder()
+                        .id(UUID.randomUUID())
+                        .title("Coffee")
+                        .amount(BigDecimal.valueOf(120))
+                        .category(Category.FOOD)
+                        .date(LocalDate.now())
+                        .build(),
+
+                Expense.builder()
+                        .id(UUID.randomUUID())
+                        .title("Movie")
+                        .amount(BigDecimal.valueOf(300))
+                        .category(Category.ENTERTAINMENT)
+                        .date(LocalDate.now())
+                        .build()
+        );
+
+        when(expenseService.getAllExpenses())
+                .thenReturn(expenses);
+
+        mockMvc.perform(get("/expenses"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(2))
+                .andExpect(jsonPath("$[0].title").value("Coffee"))
+                .andExpect(jsonPath("$[1].title").value("Movie"));
     }
 }
