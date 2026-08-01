@@ -1,6 +1,7 @@
 package com.diligent.expense_tracker.controller;
 
 import com.diligent.expense_tracker.dto.ExpenseRequest;
+import com.diligent.expense_tracker.dto.GenericResponse;
 import com.diligent.expense_tracker.dto.TotalExpenseResponse;
 import com.diligent.expense_tracker.model.Category;
 import com.diligent.expense_tracker.model.Expense;
@@ -32,14 +33,19 @@ public class ExpenseController {
             description = "Creates a new expense"
     )
     @PostMapping
-    public ResponseEntity<Expense> addExpense(
+    public ResponseEntity<GenericResponse<Expense>> addExpense(
             @Valid @RequestBody ExpenseRequest request) {
 
         Expense expense = expenseService.addExpense(request);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(expense);
+        GenericResponse<Expense> response = GenericResponse.<Expense>builder()
+                .success(true)
+                .message("Expense created successfully")
+                .data(expense)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(response);
     }
 
     @Operation(
@@ -47,14 +53,25 @@ public class ExpenseController {
             description = "Returns all expenses or filters by category"
     )
     @GetMapping
-    public ResponseEntity<List<Expense>> getExpenses(
+    public ResponseEntity<GenericResponse<List<Expense>>> getExpenses(
             @RequestParam(required = false) Category category) {
 
+        List<Expense> expenses;
+
         if (category == null) {
-            return ResponseEntity.ok(expenseService.getAllExpenses());
+            expenses = expenseService.getAllExpenses();
+        } else {
+            expenses = expenseService.getExpensesByCategory(category);
         }
 
-        return ResponseEntity.ok(expenseService.getExpensesByCategory(category));
+        GenericResponse<List<Expense>> response =
+                GenericResponse.<List<Expense>>builder()
+                        .success(true)
+                        .message("Expenses fetched successfully")
+                        .data(expenses)
+                        .build();
+
+        return ResponseEntity.ok(response);
     }
 
     @Operation(
@@ -62,15 +79,25 @@ public class ExpenseController {
             description = "Returns overall total or total by category"
     )
     @GetMapping("/total")
-    public ResponseEntity<TotalExpenseResponse> calculateTotalExpenses(
+    public ResponseEntity<GenericResponse<TotalExpenseResponse>> calculateTotalExpenses(
             @RequestParam(required = false) Category category) {
 
-        if (category == null) {
-            return ResponseEntity.ok(expenseService.calculateTotalExpenses());
+        TotalExpenseResponse total;
+
+        if(category == null){
+            total = expenseService.calculateTotalExpenses();
+        }else{
+            total = expenseService.calculateTotalExpensesByCategory(category);
         }
 
-        return ResponseEntity.ok(
-                expenseService.calculateTotalExpensesByCategory(category));
+        GenericResponse<TotalExpenseResponse> response =
+                GenericResponse.<TotalExpenseResponse>builder()
+                        .success(true)
+                        .message("Total calculated successfully")
+                        .data(total)
+                        .build();
+
+        return ResponseEntity.ok(response);
     }
 
     @Operation(
@@ -78,11 +105,17 @@ public class ExpenseController {
             description = "Deletes an expense by its ID"
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteExpense(@PathVariable UUID id) {
+    public ResponseEntity<GenericResponse<Void>> deleteExpense(@PathVariable UUID id) {
 
         expenseService.deleteExpense(id);
 
-        return ResponseEntity.noContent().build();
+        GenericResponse<Void> response = GenericResponse.<Void>builder()
+                .success(true)
+                .message("Expense deleted successfully")
+                .data(null)
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
 }
