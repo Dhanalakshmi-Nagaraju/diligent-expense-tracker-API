@@ -1,0 +1,77 @@
+package com.diligent.expense_tracker.service;
+
+import com.diligent.expense_tracker.dto.ExpenseRequest;
+import com.diligent.expense_tracker.model.Category;
+import com.diligent.expense_tracker.model.Expense;
+import com.diligent.expense_tracker.repository.ExpenseRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class ExpenseServiceImplTest {
+
+    @Mock
+    private ExpenseRepository repository;
+
+    @InjectMocks
+    private ExpenseServiceImpl expenseService;
+
+    @Test
+    void shouldAddExpenseSuccessfully() {
+
+        ExpenseRequest request = ExpenseRequest.builder()
+                .title("Coffee")
+                .amount(BigDecimal.valueOf(120))
+                .category(Category.FOOD)
+                .date(LocalDate.now())
+                .build();
+
+        when(repository.save(any(Expense.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Expense savedExpense = expenseService.addExpense(request);
+
+        assertNotNull(savedExpense);
+        assertNotNull(savedExpense.getId());
+        assertEquals("Coffee", savedExpense.getTitle());
+        assertEquals(BigDecimal.valueOf(120), savedExpense.getAmount());
+        assertEquals(Category.FOOD, savedExpense.getCategory());
+
+        verify(repository).save(any(Expense.class));
+    }
+
+    @Test
+    void shouldGenerateUuidBeforeSaving() {
+
+        ExpenseRequest request = ExpenseRequest.builder()
+                .title("Lunch")
+                .amount(BigDecimal.valueOf(250))
+                .category(Category.FOOD)
+                .date(LocalDate.now())
+                .build();
+
+        when(repository.save(any()))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        expenseService.addExpense(request);
+
+        ArgumentCaptor<Expense> captor = ArgumentCaptor.forClass(Expense.class);
+
+        verify(repository).save(captor.capture());
+
+        Expense expense = captor.getValue();
+
+        assertNotNull(expense.getId());
+    }
+}
