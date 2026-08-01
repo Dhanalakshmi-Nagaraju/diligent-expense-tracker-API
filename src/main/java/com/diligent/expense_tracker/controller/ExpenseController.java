@@ -1,6 +1,7 @@
 package com.diligent.expense_tracker.controller;
 
 import com.diligent.expense_tracker.dto.ExpenseRequest;
+import com.diligent.expense_tracker.model.Category;
 import com.diligent.expense_tracker.model.Expense;
 import com.diligent.expense_tracker.service.ExpenseService;
 import jakarta.validation.Valid;
@@ -30,10 +31,14 @@ public class ExpenseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Expense>> getAllExpenses() {
+    public ResponseEntity<List<Expense>> getExpenses(
+            @RequestParam(required = false) Category category) {
 
-        return ResponseEntity.ok(expenseService.getAllExpenses());
+        if (category == null) {
+            return ResponseEntity.ok(expenseService.getAllExpenses());
+        }
 
+        return ResponseEntity.ok(expenseService.getExpensesByCategory(category));
     }
 
 }
