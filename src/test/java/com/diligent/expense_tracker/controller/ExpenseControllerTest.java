@@ -150,4 +150,20 @@ class ExpenseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(600));
     }
+
+    @Test
+    void shouldReturnTotalExpensesByCategory() throws Exception {
+
+        TotalExpenseResponse response = TotalExpenseResponse.builder()
+                .total(BigDecimal.valueOf(350))
+                .build();
+
+        when(expenseService.calculateTotalExpensesByCategory(Category.FOOD))
+                .thenReturn(response);
+
+        mockMvc.perform(get("/expenses/total")
+                        .param("category", "FOOD"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(350));
+    }
 }

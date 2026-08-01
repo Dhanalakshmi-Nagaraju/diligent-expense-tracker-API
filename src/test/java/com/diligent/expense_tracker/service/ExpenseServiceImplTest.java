@@ -159,4 +159,32 @@ class ExpenseServiceImplTest {
 
         verify(repository).findAll();
     }
+
+    @Test
+    void shouldCalculateTotalExpensesByCategory() {
+
+        List<Expense> expenses = List.of(
+
+                Expense.builder()
+                        .amount(BigDecimal.valueOf(100))
+                        .category(Category.FOOD)
+                        .build(),
+
+                Expense.builder()
+                        .amount(BigDecimal.valueOf(250))
+                        .category(Category.FOOD)
+                        .build()
+
+        );
+
+        when(repository.findByCategory(Category.FOOD))
+                .thenReturn(expenses);
+
+        TotalExpenseResponse response =
+                expenseService.calculateTotalExpensesByCategory(Category.FOOD);
+
+        assertEquals(BigDecimal.valueOf(350), response.getTotal());
+
+        verify(repository).findByCategory(Category.FOOD);
+    }
 }

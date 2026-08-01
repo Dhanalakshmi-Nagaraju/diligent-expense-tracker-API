@@ -55,4 +55,17 @@ public class ExpenseServiceImpl implements ExpenseService {
                 .build();
     }
 
+    @Override
+    public TotalExpenseResponse calculateTotalExpensesByCategory(Category category) {
+
+        BigDecimal total = repository.findByCategory(category)
+                .stream()
+                .map(Expense::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return TotalExpenseResponse.builder()
+                .total(total)
+                .build();
+    }
+
 }

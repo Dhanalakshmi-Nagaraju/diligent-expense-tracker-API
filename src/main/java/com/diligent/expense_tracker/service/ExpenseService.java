@@ -17,4 +17,6 @@ public interface ExpenseService {
 
     TotalExpenseResponse calculateTotalExpenses();
 
+    TotalExpenseResponse calculateTotalExpensesByCategory(Category category);
+
 }
