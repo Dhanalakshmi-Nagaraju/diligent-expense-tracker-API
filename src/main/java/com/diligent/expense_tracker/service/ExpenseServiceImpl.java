@@ -1,12 +1,14 @@
 package com.diligent.expense_tracker.service;
 
 import com.diligent.expense_tracker.dto.ExpenseRequest;
+import com.diligent.expense_tracker.dto.TotalExpenseResponse;
 import com.diligent.expense_tracker.model.Category;
 import com.diligent.expense_tracker.model.Expense;
 import com.diligent.expense_tracker.repository.ExpenseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,6 +40,19 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public List<Expense> getExpensesByCategory(Category category) {
         return repository.findByCategory(category);
+    }
+
+    @Override
+    public TotalExpenseResponse calculateTotalExpenses() {
+
+        BigDecimal total = repository.findAll()
+                .stream()
+                .map(Expense::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return TotalExpenseResponse.builder()
+                .total(total)
+                .build();
     }
 
 }
