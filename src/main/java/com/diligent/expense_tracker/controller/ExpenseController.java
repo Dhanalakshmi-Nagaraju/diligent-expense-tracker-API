@@ -5,6 +5,8 @@ import com.diligent.expense_tracker.dto.TotalExpenseResponse;
 import com.diligent.expense_tracker.model.Category;
 import com.diligent.expense_tracker.model.Expense;
 import com.diligent.expense_tracker.service.ExpenseService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(
+        name = "Expense API",
+        description = "Operations related to Expense Management"
+)
 @RestController
 @RequestMapping("/expenses")
 @RequiredArgsConstructor
@@ -21,6 +27,10 @@ public class ExpenseController {
 
     private final ExpenseService expenseService;
 
+    @Operation(
+            summary = "Add Expense",
+            description = "Creates a new expense"
+    )
     @PostMapping
     public ResponseEntity<Expense> addExpense(
             @Valid @RequestBody ExpenseRequest request) {
@@ -32,6 +42,10 @@ public class ExpenseController {
                 .body(expense);
     }
 
+    @Operation(
+            summary = "Get Expenses",
+            description = "Returns all expenses or filters by category"
+    )
     @GetMapping
     public ResponseEntity<List<Expense>> getExpenses(
             @RequestParam(required = false) Category category) {
@@ -43,6 +57,10 @@ public class ExpenseController {
         return ResponseEntity.ok(expenseService.getExpensesByCategory(category));
     }
 
+    @Operation(
+            summary = "Calculate Total Expenses",
+            description = "Returns overall total or total by category"
+    )
     @GetMapping("/total")
     public ResponseEntity<TotalExpenseResponse> calculateTotalExpenses(
             @RequestParam(required = false) Category category) {
@@ -55,6 +73,10 @@ public class ExpenseController {
                 expenseService.calculateTotalExpensesByCategory(category));
     }
 
+    @Operation(
+            summary = "Delete Expense",
+            description = "Deletes an expense by its ID"
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteExpense(@PathVariable UUID id) {
 
